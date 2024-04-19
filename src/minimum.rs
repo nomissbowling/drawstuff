@@ -54,7 +54,11 @@ pub extern "C" fn c_start_callback() {
 #[no_mangle]
 pub extern "C" fn c_step_callback(pause: i32) {
   let mut bg = unsafe {
-    &mut std::slice::from_raw_parts_mut(bridge_global_getter(), 1)[0] // fake
+    let p = bridge_global_getter(0);
+    if p == 0 as *mut bridgeGlobal {
+      panic!("not allocated area: bridge_global_getter");
+    }
+    &mut std::slice::from_raw_parts_mut(p, 1)[0] // fake
   };
   if pause != bg.num as i32 {
     bg.num = pause as usize;
@@ -79,12 +83,16 @@ pub fn simple_test() {
   let mut abg = Arc::new(RefCell::new(bridgeGlobal::new()));
   let mut pbg = Pin::new(&mut abg); // to keep lifetime
 unsafe {
-  bridge_global_setter(pbg.borrow_mut().as_ptr() as *mut bridgeGlobal);
+  match bridge_global_setter(0, pbg.borrow_mut().as_ptr() as *mut bridgeGlobal)
+  {
+    0 => panic!("not allocated area: bridge_global_setter"),
+    _ => ()
+  }
 }
 
   let width = 800i32;
   let height = 600i32;
-  let a: &[u8] = b"./resources\0";
+  let a: &[u8] = b"./resources";
   let ptt = &Some(U8zBuf::from_u8array(a)); // to keep lifetime
   let mut dsfn = dsFunctions{
     version: DS_VERSION,

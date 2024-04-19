@@ -46,11 +46,11 @@ fn bindgen_test_layout_bridgeGlobal() {
 }
 extern "C" {
     #[doc = " bridge global setter"]
-    pub fn bridge_global_setter(p: *mut bridgeGlobal);
+    pub fn bridge_global_setter(n: usize, p: *mut bridgeGlobal) -> ::std::os::raw::c_uint;
 }
 extern "C" {
     #[doc = " bridge global getter"]
-    pub fn bridge_global_getter() -> *mut bridgeGlobal;
+    pub fn bridge_global_getter(n: usize) -> *mut bridgeGlobal;
 }
 #[repr(C)]
 pub struct Bridge__bindgen_vtable(::std::os::raw::c_void);
@@ -304,6 +304,10 @@ fn bindgen_test_layout_convexfvp() {
             stringify!(polygons)
         )
     );
+}
+extern "C" {
+    #[doc = " as local function to be independent of ode.hpp"]
+    pub fn _dDot(a: *const dReal, b: *const dReal, n: ::std::os::raw::c_int) -> dReal;
 }
 extern "C" {
     #[doc = " (defined in ode.hpp)"]

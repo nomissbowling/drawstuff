@@ -15,19 +15,30 @@ using namespace std;
 
 #include <bridge.hpp>
 
-/// universal area bridge global
-static bridgeGlobal *bg = NULL;
+/// as local function to be independent of ode.hpp
+dReal _dDot(const dReal *a, const dReal *b, int n)
+{
+  dReal s = 0.0;
+  for(int i = 0; i < n; ++i){ s += a[i] * b[i]; }
+  return s;
+}
+
+/// universal area bridge globals (magic number 8)
+static bridgeGlobal *bg[8] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 /// universal area bridge global setter
-void bridge_global_setter(bridgeGlobal *p)
+unsigned int bridge_global_setter(size_t n, bridgeGlobal *p)
 {
-  bg = p;
+  if(n >= sizeof(bg) / sizeof(bg[0])) return 0;
+  bg[n] = p;
+  return 1;
 }
 
 /// universal area bridge global getter
-bridgeGlobal *bridge_global_getter(void)
+bridgeGlobal *bridge_global_getter(size_t n)
 {
-  return bg;
+  if(n >= sizeof(bg) / sizeof(bg[0])) return NULL;
+  return bg[n];
 }
 
 /// construct
@@ -211,7 +222,7 @@ void Normal4(dReal *n, dReal *v) // n[4] = normal(v[9])
   dReal r = sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
   for(int j = 0; j < 3; ++j) n[j] /= r;
   // plane n[0]vx + n[1]vy + n[2]vz = n[3]
-  n[3] = dDot(n, v, 3);
+  n[3] = _dDot(n, v, 3);
 }
 
 void RecalcFaces(convexfvp *fvp)

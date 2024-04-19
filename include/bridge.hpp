@@ -13,9 +13,9 @@ typedef struct bridgeGlobal {
 
 extern "C" {
 /// bridge global setter
-void bridge_global_setter(bridgeGlobal *p);
+unsigned int bridge_global_setter(size_t n, bridgeGlobal *p);
 /// bridge global getter
-bridgeGlobal *bridge_global_getter(void);
+bridgeGlobal *bridge_global_getter(size_t n);
 }
 
 /**
@@ -85,6 +85,9 @@ struct convexfvp {
   /// polygons
   unsigned int *polygons;
 };
+
+/// as local function to be independent of ode.hpp
+dReal _dDot(const dReal *a, const dReal *b, int n);
 
 /// (defined in ode.hpp)
 dReal dDot(const dReal *a, const dReal *b, int n);

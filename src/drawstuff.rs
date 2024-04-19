@@ -47,14 +47,6 @@ pub use cppbridge::{RecalcFaces, Normal4, Cross3};
 mod cdrawstuff;
 use cdrawstuff::*;
 
-/// dummy for minimum test
-#[no_mangle] // replace bridge.hpp (defined in ode.hpp)
-pub extern "C" fn dDot(a: *const dReal, b: *const dReal, n: c_int) -> dReal {
-  let n = n as usize;
-  let a = unsafe { std::slice::from_raw_parts(a, n) };
-  let b = unsafe { std::slice::from_raw_parts(b, n) };
-  (0..n).into_iter().map(|i| a[i] * b[i]).sum::<dReal>()
-}
 pub type dReal = f64; // replace bridge.hpp (defined in ode.hpp)
 pub type dTriIndex = u32; // replace bridge.hpp (defined in ode.hpp)
 // pub use cppode::{dMatrix4, dMatrix3, dVector4, dVector3}; // 16 12 4
@@ -67,16 +59,13 @@ pub type dTriIndex = u32; // replace bridge.hpp (defined in ode.hpp)
 #[warn(non_camel_case_types)]
 #[warn(non_upper_case_globals)]
 
-use std::ffi::c_int;
-
-/*
 /// u32 RGBA (little endian) to dVector4 color
-pub fn vec4_from_u32(col: u32) -> dVector4 {
+/// (not use dVector4 and mat::v2a to be independent of ode)
+pub fn vec4_from_u32(col: u32) -> [dReal; 4] {
   let p: usize = &col as *const u32 as usize;
-  mat::v2a((0..4).into_iter().map(|j|
+  (0..4).into_iter().map(|j|
 unsafe {
     *((p + (3 - j)) as *const u8) as dReal / 255.0 // little endian
 }
-  ).collect())
+  ).collect::<Vec<_>>().try_into().unwrap()
 }
-*/
