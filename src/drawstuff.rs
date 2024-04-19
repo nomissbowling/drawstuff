@@ -59,13 +59,16 @@ pub type dTriIndex = u32; // replace bridge.hpp (defined in ode.hpp)
 #[warn(non_camel_case_types)]
 #[warn(non_upper_case_globals)]
 
+use num::Float;
+
 /// u32 RGBA (little endian) to dVector4 color
 /// (not use dVector4 and mat::v2a to be independent of ode)
-pub fn vec4_from_u32(col: u32) -> [dReal; 4] {
+pub fn vec4_from_u32<F: Float + std::fmt::Debug>(col: u32) -> [F; 4] {
   let p: usize = &col as *const u32 as usize;
   (0..4).into_iter().map(|j|
 unsafe {
-    *((p + (3 - j)) as *const u8) as dReal / 255.0 // little endian
+    let u = *((p + (3 - j)) as *const u8); // little endian
+    <F>::from(u).unwrap() / <F>::from(255.0).unwrap()
 }
   ).collect::<Vec<_>>().try_into().unwrap()
 }
