@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/drawstuff/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/drawstuff/0.1.1")]
 //! ODE drawstuff bindings for Rust
 //!
 //! # Requirements
@@ -30,12 +30,23 @@ mod minimum; // private only for minimum test
 
 #[cfg(test)]
 mod tests {
-  use super::minimum::simple_test;
+  use super::minimum::{simple_test, dReal, _dDot};
 
   /// with [-- --nocapture] or with [-- --show-output]
   #[test]
   fn test_drawstuff() {
     assert_eq!(simple_test(), ());
+  }
+
+  #[test]
+  fn test_bridge() {
+    let a: [dReal; 4] = [0.1, 0.2, 0.3, 0.4];
+    let b: [dReal; 4] = [0.1, 0.2, 0.3, 0.4];
+    let d = unsafe { _dDot(
+      &a as *const [dReal; 4] as *const dReal,
+      &b as *const [dReal; 4] as *const dReal,
+      4) };
+    assert_eq!(d - 0.3 < 0.000001, true);
   }
 
 /*

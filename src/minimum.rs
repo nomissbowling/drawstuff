@@ -44,26 +44,64 @@ impl TBridgeGlobal for bridgeGlobal {
   }
 }
 
+/// fake with_bg_mut for any pinned type
+#[macro_export]
+macro_rules! any_pinned_with_bg_mut {
+  ($i: ident, $n: expr, $f: expr) => {
+    Pin::<&mut Arc<RefCell<$i>>>::with_bg_mut($n, $f)
+  }
+}
+
+/// trait TGlobalSetGet
+pub trait TGlobalSetGet<T> {
+  /// set bg
+  fn set_bg_mut(&mut self, n: usize);
+  /// with bg
+  fn with_bg_mut<F>(n: usize, f: F) where F: Fn(&mut T) -> ();
+}
+
+/// TGlobalSetGet for Pin<&mut Arc<RefCell<T>>>
+impl<T> TGlobalSetGet<T> for Pin<&mut Arc<RefCell<T>>> {
+  /// set bg
+  fn set_bg_mut(&mut self, n: usize) {
+    unsafe {
+      match bridge_global_setter(n, self.borrow_mut().as_ptr()
+        as *mut T as *mut bridgeGlobal) {
+        0 => panic!("not allocated area: bridge_global_setter"),
+        _ => ()
+      }
+    }
+  }
+  /// with bg
+  fn with_bg_mut<F>(n: usize, f: F) where F: Fn(&mut T) -> () {
+    f(unsafe {
+      let p = bridge_global_getter(n);
+      if p == 0 as *mut bridgeGlobal {
+        panic!("not allocated area: bridge_global_getter");
+      }
+      &mut std::slice::from_raw_parts_mut(p as *mut T, 1)[0] // fake
+    })
+  }
+}
+
 /// start callback
 #[no_mangle]
 pub extern "C" fn c_start_callback() {
   println!("c_start_callback");
+  any_pinned_with_bg_mut!(bridgeGlobal, 0, |bg| {
+    bg.num = 0;
+  });
 }
 
 /// step callback
 #[no_mangle]
 pub extern "C" fn c_step_callback(pause: i32) {
-  let mut bg = unsafe {
-    let p = bridge_global_getter(0);
-    if p == 0 as *mut bridgeGlobal {
-      panic!("not allocated area: bridge_global_getter");
+  any_pinned_with_bg_mut!(bridgeGlobal, 0, move |bg| {
+    if pause != bg.num as i32 {
+      bg.num = pause as usize;
+      println!("c_step_callback: pause = {}", pause);
     }
-    &mut std::slice::from_raw_parts_mut(p, 1)[0] // fake
-  };
-  if pause != bg.num as i32 {
-    bg.num = pause as usize;
-    println!("c_step_callback: pause = {}", pause);
-  }
+  });
 }
 
 /// command callback
@@ -82,13 +120,7 @@ pub extern "C" fn c_stop_callback() {
 pub fn simple_test() {
   let mut abg = Arc::new(RefCell::new(bridgeGlobal::new()));
   let mut pbg = Pin::new(&mut abg); // to keep lifetime
-unsafe {
-  match bridge_global_setter(0, pbg.borrow_mut().as_ptr() as *mut bridgeGlobal)
-  {
-    0 => panic!("not allocated area: bridge_global_setter"),
-    _ => ()
-  }
-}
+  pbg.set_bg_mut(0);
 
   let width = 800i32;
   let height = 600i32;
