@@ -77,6 +77,11 @@ pub extern "C" fn c_start_callback() {
     *bg = AnySlot::new(240, 192, 32, 255);
     println!("{:?}", bg);
   });
+
+unsafe {
+  dsSetSphereQuality(3); // default 1
+  dsSetCapsuleQuality(3); // default 3
+}
 }
 
 /// step callback
@@ -90,8 +95,51 @@ pub extern "C" fn c_step_callback(pause: i32) {
       any_pinned_with_bg_mut!(AnySlot, 1, |bg| { // another slot in the closure
         println!("{:?}", bg);
       });
+
+unsafe {
+      let et = dsElapsedTime(); // f64
+      println!("{:?}", et);
+}
     }
   });
+
+unsafe {
+  // dsSetDrawMode(DS_POLYFILL); // WIREFRAME
+  // dsSetTexture(DS_WOOD); // CHECKERED GROUND SKY
+
+  let c = vec4_from_u32(0xE0C020FF).into_iter().map(|f|
+    f as f32).collect::<Vec<_>>();
+  dsSetColorAlpha(c[0], c[1], c[2], c[3]);
+  let r = 0.1f32;
+  let p: [f32; 3] = [0.0, 0.0, r];
+  let m: [f32; 12] = [
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0];
+  dsDrawSphere(
+    &p as *const [f32; 3] as *const f32,
+    &m as *const [f32; 12] as *const f32,
+    r);
+
+  let c = vec4_from_u32(0xC0E020C0).into_iter().map(|f|
+    f as f32).collect::<Vec<_>>();
+  dsSetColorAlpha(c[0], c[1], c[2], c[3]);
+  let a = 6.0f32;
+  let t = a * std::f32::consts::PI / 180.0f32;
+  let (c, s) = (a.cos(), a.sin());
+  let l = 0.5f32;
+  let r = 0.1f32;
+  let p: [f32; 3] = [0.5, 0.0, r + l / 2.0];
+  let m: [f32; 12] = [
+    1.0, 0.0, 0.0, 0.0,
+    0.0, c, -s, 0.0,
+    0.0, s, c, 0.0];
+  dsDrawCapsule(
+    &p as *const [f32; 3] as *const f32,
+    &m as *const [f32; 12] as *const f32,
+    l,
+    r);
+}
 }
 
 /// command callback

@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/drawstuff/0.1.2")]
+#![doc(html_root_url = "https://docs.rs/drawstuff/0.1.3")]
 //! ODE drawstuff bindings for Rust
 //!
 //! # Requirements
