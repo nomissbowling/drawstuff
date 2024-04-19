@@ -23,24 +23,6 @@ dReal _dDot(const dReal *a, const dReal *b, int n)
   return s;
 }
 
-/// universal area bridge globals (magic number 8)
-static bridgeGlobal *bg[8] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-
-/// universal area bridge global setter
-unsigned int bridge_global_setter(size_t n, bridgeGlobal *p)
-{
-  if(n >= sizeof(bg) / sizeof(bg[0])) return 0;
-  bg[n] = p;
-  return 1;
-}
-
-/// universal area bridge global getter
-bridgeGlobal *bridge_global_getter(size_t n)
-{
-  if(n >= sizeof(bg) / sizeof(bg[0])) return NULL;
-  return bg[n];
-}
-
 /// construct
 Bridge::Bridge() : str("_bridge")
 {

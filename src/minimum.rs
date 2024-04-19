@@ -17,7 +17,7 @@
 #![allow(non_upper_case_globals)]
 
 include!(concat!("../drawstuff", "/drawstuff_bindings.rs"));
-include!(concat!("../include", "/bridge_bindings.rs"));
+include!(concat!("../include", "/bridge_bindings.rs")); // test for _dDot
 
 // use above privates only for minimum test (MUST NOT use include in your code)
 
@@ -25,62 +25,43 @@ use crate::drawstuff::*;
 
 use asciiz::u8z::{U8zBuf, u8zz::{CArgsBuf}};
 
+use anyslot::anyslot::{
+  bridge_global_init_slots, bridge_global_dispose_slots,
+  any_pinned_init_slots, any_pinned_dispose_slots,
+  any_pinned_set_bg_mut, any_pinned_with_bg_mut,
+  TBridgeGlobal, TGlobalSetGet, bridge_global};
+
 use std::pin::Pin;
 use std::sync::Arc;
 use std::cell::RefCell;
 use std::borrow::BorrowMut;
 
-/// trait TBridgeGlobal
-pub trait TBridgeGlobal {
+/// AnySlot
+#[derive(Debug, Clone)]
+pub struct AnySlot {
+  /// r
+  pub r: u8,
+  /// g
+  pub g: u8,
+  /// b
+  pub b: u8,
+  /// a
+  pub a: u8
+}
+
+/// TBridgeGlobal for AnySlot
+impl TBridgeGlobal for AnySlot {
   /// constructor
-  fn new() -> Self;
+  fn void() -> Self {
+    AnySlot::new(0, 0, 0, 0)
+  }
 }
 
-/// TBridgeGlobal for bridgeGlobal
-impl TBridgeGlobal for bridgeGlobal {
+/// AnySlot
+impl AnySlot {
   /// constructor
-  fn new() -> Self {
-    bridgeGlobal{num: 0, buf: [0; 8]}
-  }
-}
-
-/// fake with_bg_mut for any pinned type
-#[macro_export]
-macro_rules! any_pinned_with_bg_mut {
-  ($i: ident, $n: expr, $f: expr) => {
-    Pin::<&mut Arc<RefCell<$i>>>::with_bg_mut($n, $f)
-  }
-}
-
-/// trait TGlobalSetGet
-pub trait TGlobalSetGet<T> {
-  /// set bg
-  fn set_bg_mut(&mut self, n: usize);
-  /// with bg
-  fn with_bg_mut<F>(n: usize, f: F) where F: Fn(&mut T) -> ();
-}
-
-/// TGlobalSetGet for Pin<&mut Arc<RefCell<T>>>
-impl<T> TGlobalSetGet<T> for Pin<&mut Arc<RefCell<T>>> {
-  /// set bg
-  fn set_bg_mut(&mut self, n: usize) {
-    unsafe {
-      match bridge_global_setter(n, self.borrow_mut().as_ptr()
-        as *mut T as *mut bridgeGlobal) {
-        0 => panic!("not allocated area: bridge_global_setter"),
-        _ => ()
-      }
-    }
-  }
-  /// with bg
-  fn with_bg_mut<F>(n: usize, f: F) where F: Fn(&mut T) -> () {
-    f(unsafe {
-      let p = bridge_global_getter(n);
-      if p == 0 as *mut bridgeGlobal {
-        panic!("not allocated area: bridge_global_getter");
-      }
-      &mut std::slice::from_raw_parts_mut(p as *mut T, 1)[0] // fake
-    })
+  pub fn new(r: u8, g: u8, b: u8, a: u8) -> Self {
+    AnySlot{r, g, b, a}
   }
 }
 
@@ -88,18 +69,27 @@ impl<T> TGlobalSetGet<T> for Pin<&mut Arc<RefCell<T>>> {
 #[no_mangle]
 pub extern "C" fn c_start_callback() {
   println!("c_start_callback");
-  any_pinned_with_bg_mut!(bridgeGlobal, 0, |bg| {
+  any_pinned_with_bg_mut!(bridge_global, 0, |bg| {
     bg.num = 0;
+  });
+  any_pinned_with_bg_mut!(AnySlot, 1, |bg| {
+    println!("{:?}", bg);
+    *bg = AnySlot::new(240, 192, 32, 255);
+    println!("{:?}", bg);
   });
 }
 
 /// step callback
 #[no_mangle]
 pub extern "C" fn c_step_callback(pause: i32) {
-  any_pinned_with_bg_mut!(bridgeGlobal, 0, move |bg| {
+  any_pinned_with_bg_mut!(bridge_global, 0, move |bg| { // test with move
     if pause != bg.num as i32 {
       bg.num = pause as usize;
       println!("c_step_callback: pause = {}", pause);
+
+      any_pinned_with_bg_mut!(AnySlot, 1, |bg| { // another slot in the closure
+        println!("{:?}", bg);
+      });
     }
   });
 }
@@ -118,9 +108,9 @@ pub extern "C" fn c_stop_callback() {
 
 /// simple test
 pub fn simple_test() {
-  let mut abg = Arc::new(RefCell::new(bridgeGlobal::new()));
-  let mut pbg = Pin::new(&mut abg); // to keep lifetime
-  pbg.set_bg_mut(0);
+  any_pinned_init_slots!(8);
+  any_pinned_set_bg_mut!(bridge_global, 0);
+  any_pinned_set_bg_mut!(AnySlot, 1);
 
   let width = 800i32;
   let height = 600i32;
@@ -139,4 +129,6 @@ unsafe {
   dsSimulationLoop(cab.as_argc(), cab.as_argv_ptr_mut(),
     width, height, &mut dsfn);
 }
+
+  any_pinned_dispose_slots!();
 }

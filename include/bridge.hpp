@@ -3,21 +3,6 @@
 #ifndef __BRIDGE_H__
 #define __BRIDGE_H__
 
-/// universal area bridge global
-typedef struct bridgeGlobal {
-  /// num
-  size_t num;
-  /// may be changed by alloc
-  unsigned char buf[8];
-} bridgeGlobal;
-
-extern "C" {
-/// bridge global setter
-unsigned int bridge_global_setter(size_t n, bridgeGlobal *p);
-/// bridge global getter
-bridgeGlobal *bridge_global_getter(size_t n);
-}
-
 /**
  * Bridge for cpp
  */
