@@ -238,11 +238,12 @@ unsafe {
   });
 
   any_pinned_with_bg_mut!(Stat, 2, |st| {
+    let mut col = [0.0f32; 4];
     any_pinned_with_bg_mut!(COLORS, 1, |bg| {
       let n = (st.tick as usize / 1000) % bg.c.len();
-      let col = vec4_from_4u8::<f32>(&bg.c[n]);
-      draw(&st, &col);
+      col = vec4_from_4u8::<f32>(&bg.c[n]);
     });
+    draw(&st, &col);
     st.tick += 1;
   });
 }
