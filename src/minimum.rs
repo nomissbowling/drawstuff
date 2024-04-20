@@ -158,9 +158,9 @@ unsafe {
   dsSetTexture(DS_TEXTURE_NUMBER_DS_WOOD);
   let c = vec4_from_u32::<f32>(0xC0E020C0);
   dsSetColorAlpha(c[0], c[1], c[2], c[3]);
-  let a = 6.0f32;
+  let a = 15.0f32;
   let t = a * std::f32::consts::PI / 180.0f32;
-  let (c, s) = (a.cos(), a.sin());
+  let (c, s) = (t.cos(), t.sin());
   let l = 0.5f32;
   let r = 0.1f32;
   let p: [f32; 3] = [0.5, 0.0, r + l / 2.0];
@@ -178,12 +178,13 @@ unsafe {
   dsSetColorAlpha(col[0], col[1], col[2], col[3]);
 //  let c = vec4_from_u32::<f32>(0xC020E0C0);
 //  dsSetColorAlpha(c[0], c[1], c[2], c[3]);
-  let a = ((st.tick / 200) % 360) as f32;
+  let a = ((st.tick / 6) % 360) as f32;
   let t = a * std::f32::consts::PI / 180.0f32;
-  let (c, s) = (a.cos(), a.sin());
+  let (cp, sp) = (t.cos(), t.sin());
+  let (c, s) = { let t = t * 6.0; (t.cos(), t.sin()) }; // change t
   let l = 0.5f32;
   let r = 0.1f32;
-  let p: [f32; 3] = [c, s, r + l / 2.0];
+  let p: [f32; 3] = [cp, sp, r + l / 2.0];
   let m: [f32; 12] = [
     1.0, 0.0, 0.0, 0.0,
     0.0, c, -s, 0.0,
