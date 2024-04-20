@@ -47,8 +47,10 @@ pub use cppbridge::{RecalcFaces, Normal4, Cross3};
 mod cdrawstuff;
 use cdrawstuff::*;
 
-pub type dReal = f64; // replace bridge.hpp (defined in ode.hpp)
-pub type dTriIndex = u32; // replace bridge.hpp (defined in ode.hpp)
+/// replace bridge.hpp (defined in ode.hpp)
+pub type dReal = f64;
+/// replace bridge.hpp (defined in ode.hpp)
+pub type dTriIndex = u32;
 // pub use cppode::{dMatrix4, dMatrix3, dVector4, dVector3}; // 16 12 4
 // pub use cppode::{dQuaternion};
 
