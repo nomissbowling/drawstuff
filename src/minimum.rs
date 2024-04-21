@@ -9,18 +9,6 @@
 //! - libwinpthread-1.dll
 //!
 
-#![allow(unused)]
-// #![allow(unused_imports)]
-// #![allow(unused_attributes)]
-#![allow(non_snake_case)]
-#![allow(non_camel_case_types)]
-#![allow(non_upper_case_globals)]
-
-include!(concat!("../drawstuff", "/drawstuff_bindings.rs"));
-include!(concat!("../include", "/bridge_bindings.rs")); // test for _dDot
-
-// use above privates only for minimum test (MUST NOT use include in your code)
-
 use crate::drawstuff::*;
 
 use asciiz::u8z::{U8zBuf, u8zz::{CArgsBuf}};
@@ -34,7 +22,6 @@ use anyslot::anyslot::{
 use std::pin::Pin;
 use std::sync::Arc;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 
 use num::Float;
 
@@ -55,11 +42,11 @@ pub struct COLORS {
 /// fmt::Display for COLORS
 impl std::fmt::Display for COLORS {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "[");
+    write!(f, "[")?;
     for (i, c) in self.c.iter().enumerate() {
-      if i != 0 { write!(f, " "); }
-      write!(f, "{}", c);
-      if i == self.c.len() - 1 { write!(f, "]"); } else { writeln!(f, ","); }
+      if i != 0 { write!(f, " ")?; }
+      write!(f, "{}", c)?;
+      if i == self.c.len() - 1 { write!(f, "]")?; } else { writeln!(f, ",")?; }
     }
     Ok(())
   }

@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/drawstuff/0.1.7")]
+#![doc(html_root_url = "https://docs.rs/drawstuff/0.1.8")]
 //! ODE drawstuff bindings for Rust
 //!
 //! # Requirements
@@ -26,11 +26,12 @@
 
 pub mod drawstuff;
 
-mod minimum; // private only for minimum test
+pub mod minimum;
 
 #[cfg(test)]
 mod tests {
-  use super::minimum::{simple_test, dReal, _dDot};
+  use super::drawstuff::{dReal, _dDot};
+  use super::minimum::simple_test;
 
   /// with [-- --nocapture] or with [-- --show-output]
   #[test]

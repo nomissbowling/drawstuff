@@ -43,9 +43,10 @@ pub use cppbridge::{Bridge, bput};
 pub use cppbridge::{dMULTIPLY0_331, dMULTIPLY0_333};
 pub use cppbridge::{convexfvp, trimeshvi};
 pub use cppbridge::{RecalcFaces, Normal4, Cross3};
+pub use cppbridge::_dDot;
 
 mod cdrawstuff;
-use cdrawstuff::*;
+pub use cdrawstuff::*;
 
 /// replace bridge.hpp (defined in ode.hpp)
 pub type dReal = f64;
