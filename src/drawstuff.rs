@@ -41,9 +41,14 @@ mod cppbridge;
 use cppbridge::*;
 pub use cppbridge::{Bridge, bput};
 pub use cppbridge::{dMULTIPLY0_331, dMULTIPLY0_333};
+pub use cppbridge::{dMULTIPLY0_441, dMULTIPLY0_444};
 pub use cppbridge::{convexfvp, trimeshvi};
+pub use cppbridge::{CopyConvexFVP, CopyTriMeshVI};
+// use cppbridge::{ScaleConvexFVP, ScaleTriMeshVI, SetScaleLimit}; // private
+pub use cppbridge::{CvtConvexFVPFromTriMeshVI, CvtTriMeshVIFromConvexFVP};
+pub use cppbridge::{FreeConvexFVP, FreeTriMeshVI};
 pub use cppbridge::{RecalcFaces, Normal4, Cross3};
-pub use cppbridge::_dDot;
+pub use cppbridge::_dDot; // another dDot defined in ode.hpp
 
 mod cdrawstuff;
 pub use cdrawstuff::*;
