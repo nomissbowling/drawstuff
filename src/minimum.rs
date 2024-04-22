@@ -129,7 +129,7 @@ unsafe {
   // dsSetTexture(DS_WOOD); // CHECKERED GROUND SKY
 
   dsSetColorAlpha(col[0], col[1], col[2], col[3]);
-//  let c = vec4_from_u32::<f32>(0xE0C020FF);
+//  let c = ds_vec4_from_u32::<f32>(0xE0C020FF);
 //  dsSetColorAlpha(c[0], c[1], c[2], c[3]);
   let r = 0.1f32;
   let p: [f32; 3] = [0.0, 0.0, r];
@@ -143,7 +143,7 @@ unsafe {
     r);
 
   dsSetTexture(DS_TEXTURE_NUMBER_DS_WOOD);
-  let c = vec4_from_u32::<f32>(0xC0E020C0);
+  let c = ds_vec4_from_u32::<f32>(0xC0E020C0);
   dsSetColorAlpha(c[0], c[1], c[2], c[3]);
   let a = 15.0f32;
   let t = a * std::f32::consts::PI / 180.0f32;
@@ -163,7 +163,7 @@ unsafe {
 
   dsSetTexture(DS_TEXTURE_NUMBER_DS_CHECKERED);
   dsSetColorAlpha(col[0], col[1], col[2], col[3]);
-//  let c = vec4_from_u32::<f32>(0xC020E0C0);
+//  let c = ds_vec4_from_u32::<f32>(0xC020E0C0);
 //  dsSetColorAlpha(c[0], c[1], c[2], c[3]);
   let a = ((st.tick / 6) % 360) as f32;
   let t = a * std::f32::consts::PI / 180.0f32;

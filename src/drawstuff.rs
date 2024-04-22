@@ -56,7 +56,7 @@ use num::Float;
 
 /// u32 RGBA (little endian) to dVector4 color
 /// (not use dVector4 and mat::v2a to be independent of ode)
-pub fn vec4_from_u32<F: Float + std::fmt::Debug>(col: u32) -> [F; 4] {
+pub fn ds_vec4_from_u32<F: Float + std::fmt::Debug>(col: u32) -> [F; 4] {
   let p: usize = &col as *const u32 as usize;
   (0..4).into_iter().map(|j|
 unsafe {
