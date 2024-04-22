@@ -40,25 +40,10 @@
 mod cppbridge;
 use cppbridge::*;
 pub use cppbridge::{Bridge, bput};
-pub use cppbridge::{dMULTIPLY0_331, dMULTIPLY0_333};
-pub use cppbridge::{dMULTIPLY0_441, dMULTIPLY0_444};
-pub use cppbridge::{convexfvp, trimeshvi};
-pub use cppbridge::{CopyConvexFVP, CopyTriMeshVI};
-// use cppbridge::{ScaleConvexFVP, ScaleTriMeshVI, SetScaleLimit}; // private
-pub use cppbridge::{CvtConvexFVPFromTriMeshVI, CvtTriMeshVIFromConvexFVP};
-pub use cppbridge::{FreeConvexFVP, FreeTriMeshVI};
-pub use cppbridge::{RecalcFaces, Normal4, Cross3};
-pub use cppbridge::_dDot; // another dDot defined in ode.hpp
+pub use cppbridge::{dReal, _dDot}; // another dDot defined in ode.hpp
 
 mod cdrawstuff;
 pub use cdrawstuff::*;
-
-/// replace bridge.hpp (defined in ode.hpp)
-pub type dReal = f64;
-/// replace bridge.hpp (defined in ode.hpp)
-pub type dTriIndex = u32;
-// pub use cppode::{dMatrix4, dMatrix3, dVector4, dVector3}; // 16 12 4
-// pub use cppode::{dQuaternion};
 
 #[warn(unused)]
 // #[warn(unused_imports)]
